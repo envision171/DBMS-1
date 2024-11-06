@@ -1,0 +1,78 @@
+// Step 1: Connect to MongoDB (this is usually done outside of the script in the shell)
+
+// Step 2: Create database and use it
+use Assignment4;
+
+// Step 3: Create collections
+db.createCollection("Teachers");
+db.createCollection("Students");
+
+// Step 4: Insert sample data into Teachers collection
+db.Teachers.insertMany([
+    { Tname: "Praveen", dno: 1, dname: "Computer", experience: 5, salary: 60000, date_of_joining: new Date("2018-06-15") },
+    { Tname: "Alice", dno: 2, dname: "IT", experience: 7, salary: 70000, date_of_joining: new Date("2016-08-20") },
+    { Tname: "Bob", dno: 3, dname: "E&TC", experience: 4, salary: 55000, date_of_joining: new Date("2019-01-10") },
+    { Tname: "Charlie", dno: 4, dname: "Computer", experience: 6, salary: 80000, date_of_joining: new Date("2017-02-12") },
+    { Tname: "David", dno: 5, dname: "IT", experience: 8, salary: 90000, date_of_joining: new Date("2015-03-25") }
+]);
+
+// Step 5: Insert sample data into Students collection
+db.Students.insertMany([
+    { Sname: "John", roll_no: 1, class: "10th" },
+    { Sname: "Sarah", roll_no: 2, class: "10th" },
+    { Sname: "Mike", roll_no: 3, class: "11th" },
+    { Sname: "Anna", roll_no: 4, class: "12th" },
+    { Sname: "xyz", roll_no: 5, class: "12th" }
+]);
+
+// Step 6: Perform CRUD operations
+
+// 1. Find all teachers alphabetically
+print("1. All Teachers Alphabetically:");
+db.Teachers.find().sort({ Tname: 1 }).pretty();
+
+// 2. Find all teachers of the Computer department
+print("2. Teachers of Computer Department:");
+db.Teachers.find({ dname: "Computer" }).pretty();
+
+// 3. Find teachers of Computer, IT, and E&TC departments
+print("3. Teachers of Computer, IT, and E&TC Departments:");
+db.Teachers.find({ dname: { $in: ["Computer", "IT", "E&TC"] } }).pretty();
+
+// 4. Find teachers of Computer, IT, and E&TC with salary >= 10000 
+print("4. Teachers of Computer, IT, and E&TC with Salary >= 10000");
+db.Teachers.find({
+    dname: { $in: ["Computer", "IT", "E&TC"] },
+    salary: { $gte: 10000  }
+}).pretty();
+
+// 5. Find student information with roll_no = 2 or Sname = 'xyz'
+print("5. Student with roll_no = 2 or Sname = 'xyz':");
+db.Students.find({ $or: [{ roll_no: 2 }, { Sname: "xyz" }] }).pretty();
+
+// 6. Update the experience of teacher Praveen to 10 years, or insert if not exists
+print("6. Updating experience of teacher Praveen to 10 years:");
+db.Teachers.updateOne(
+    { Tname: "Praveen" },
+    { $set: { experience: 10 } },
+    { upsert: true }
+);
+
+// 7. Update department of all teachers in IT department to COMP
+print("7. Updating department of all teachers in IT department to COMP:");
+db.Teachers.updateMany(
+    { dname: "IT" },
+    { $set: { dname: "COMP" } }
+);
+
+// 8. Find teacher names and their experience
+print("8. Teacher Names and Their Experience:");
+db.Teachers.find({}, { Tname: 1, experience: 1 }).pretty();	
+
+// 9. Delete all documents from Teachers collection having IT department
+print("9. Deleting all teachers from IT department:");
+db.Teachers.deleteMany({ dname: "IT" });
+
+// 10. Display the first 3 documents in ascending order using pretty()
+print("10. First 3 documents in Teachers collection:");
+db.Teachers.find().sort({ Tname: 1 }).limit(3).pretty();
